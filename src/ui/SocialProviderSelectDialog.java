@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBCardLayout;
 import common.Constants;
+import io.netty.util.Constant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import social.SocialType;
@@ -18,7 +19,16 @@ public class SocialProviderSelectDialog extends DialogWrapper implements ActionL
     private JComboBox<String> list;
     private SocialType selectedType = SocialType.DEFAULT;
 
-    public SocialProviderSelectDialog() {
+    public static SocialProviderSelectDialog createInstance() {
+        SocialProviderSelectDialog dialog = new SocialProviderSelectDialog();
+
+        dialog.setResizable(false);
+        dialog.setTitle(Constants.SOCIAL_DIALOG_TITLE);
+
+        return dialog;
+    }
+
+    private SocialProviderSelectDialog() {
         super(false);
         init();
     }
