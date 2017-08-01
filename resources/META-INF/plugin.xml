@@ -32,7 +32,6 @@
 
         <action class="actions.auth.AuthAction" id="1121" text="Authorize in networks">
             <add-to-group group-id="BuildMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="ctrl shift A S" keymap="$default"/>
         </action>
         
     </actions>
