@@ -4,10 +4,9 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBCardLayout;
 import common.Constants;
-import io.netty.util.Constant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import social.SocialType;
+import data.social.SocialType;
 
 import javax.swing.*;
 import java.awt.*;

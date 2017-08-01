@@ -7,13 +7,16 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
 import common.Constants;
+import data.social.SocialAuthenticator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import social.SocialType;
+import data.social.SocialType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class AuthDialog extends DialogWrapper {
 
@@ -23,21 +26,25 @@ public class AuthDialog extends DialogWrapper {
     private static final int DEFAULT_COLUMNS_COUNT = 25;
 
     /**
-     * Selected social type
-     * from {@link SocialProviderSelectDialog}
+     * Social authenticator for selected {@link SocialType}
      */
-    private final SocialType type;
+    private final SocialAuthenticator socialAuthenticator;
+
+    @Nullable
+    private JTextField usernameField;
+
+    @Nullable
+    private JBPasswordField passwordField;
 
     static AuthDialog createInstance(SocialType type) {
         AuthDialog dialog = new AuthDialog(type);
-        dialog.setAutoAdjustable(true);
         dialog.setTitle(Constants.AUTH_DIALOG_CREDENTIALS_TITLE);
-        return new AuthDialog(type);
+        return dialog;
     }
 
     private AuthDialog(SocialType type) {
         super(false);
-        this.type = type;
+        this.socialAuthenticator = SocialAuthenticator.Factory.create(type);
         init();
     }
 
@@ -55,7 +62,17 @@ public class AuthDialog extends DialogWrapper {
         return new DialogWrapperAction(Constants.AUTH_BTN_AUTHORIZE) {
             @Override
             protected void doAction(ActionEvent actionEvent) {
-                dispose();
+                if (AuthDialog.this.usernameField == null || AuthDialog.this.passwordField == null) {
+                    return;
+                }
+
+                String username = AuthDialog.this.usernameField.getText();
+                String password = String.valueOf(AuthDialog.this.passwordField.getPassword());
+
+                AuthDialog.this.socialAuthenticator.authorize(username, password)
+                        .thenAcceptAsync(aBoolean -> {
+                            System.out.println("Logged in");
+                        });
             }
         };
     }
@@ -63,10 +80,9 @@ public class AuthDialog extends DialogWrapper {
     private void initializeLayout(JPanel dialog) {
         dialog.setLayout(new GridBagLayout());
 
-        JTextField username = new JBTextField(DEFAULT_COLUMNS_COUNT);
-        JPasswordField password = new JBPasswordField();
-
-        password.setColumns(DEFAULT_COLUMNS_COUNT);
+        this.usernameField = new JBTextField(DEFAULT_COLUMNS_COUNT);
+        this.passwordField = new JBPasswordField();
+        this.passwordField.setColumns(DEFAULT_COLUMNS_COUNT);
 
         JBInsets fieldInsets = JBUI.insets(0, 0, 5, 5);
         JBInsets labelInsets = JBUI.insets(0, 0, 5, 0);
@@ -88,7 +104,7 @@ public class AuthDialog extends DialogWrapper {
         constraints.gridwidth = 2;
         constraints.insets = labelInsets;
 
-        dialog.add(username, constraints);
+        dialog.add(this.usernameField, constraints);
 
         // Password hint label
         constraints.gridx = 0;
@@ -104,6 +120,6 @@ public class AuthDialog extends DialogWrapper {
         constraints.gridwidth = 2;
         constraints.insets = labelInsets;
 
-        dialog.add(password, constraints);
+        dialog.add(this.passwordField, constraints);
     }
 }

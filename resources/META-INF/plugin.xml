@@ -30,7 +30,7 @@
 
     <actions>
 
-        <action class="actions.auth.AuthAction" id="1121" text="Authorize in networks">
+        <action class="actions.AuthAction" id="1121" text="Authorize in networks">
             <add-to-group group-id="BuildMenu" anchor="last"/>
         </action>
         

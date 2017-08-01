@@ -1,8 +1,9 @@
-package social;
+package data.social;
 
 public enum SocialType {
 
     TWITTER,
+
     DEFAULT
 
 }

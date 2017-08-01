@@ -1,4 +1,4 @@
-package actions.auth;
+package actions;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
