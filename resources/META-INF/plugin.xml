@@ -1,35 +1,40 @@
 <idea-plugin>
 
-  <id>com.your.company.unique.plugin.id</id>
+    <id>com.your.company.unique.plugin.id</id>
 
-  <name>Plugin display name here</name>
+    <name>Plugin display name here</name>
 
-  <version>1.0</version>
+    <version>1.0</version>
 
-  <vendor email="ilya.ryabchuk@gmail.com">Ilya Ryabchuk</vendor>
+    <vendor email="ilya.ryabchuk@gmail.com">Ilya Ryabchuk</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Enter short description for your plugin here.<br>
       <em>most HTML tags may be used</em>
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Add change notes here.<br>
       <em>most HTML tags may be used</em>
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="145.0"/>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.0"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <depends>com.intellij.modules.lang</depends>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
 
-  <extensions defaultExtensionNs="com.intellij"/>
+    <extensions defaultExtensionNs="com.intellij"/>
 
-  <actions>
+    <actions>
 
-  </actions>
+        <action class="actions.auth.AuthAction" id="1121" text="Authorize in networks">
+            <add-to-group group-id="BuildMenu" anchor="last"/>
+            <keyboard-shortcut first-keystroke="ctrl shift A S" keymap="$default"/>
+        </action>
+        
+    </actions>
 
 </idea-plugin>
