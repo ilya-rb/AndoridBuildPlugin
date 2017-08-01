@@ -8,15 +8,13 @@ import com.intellij.util.ui.JBInsets;
 import com.intellij.util.ui.JBUI;
 import common.Constants;
 import data.social.SocialAuthenticator;
+import data.social.SocialType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import data.social.SocialType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public class AuthDialog extends DialogWrapper {
 
@@ -69,12 +67,15 @@ public class AuthDialog extends DialogWrapper {
                 String username = AuthDialog.this.usernameField.getText();
                 String password = String.valueOf(AuthDialog.this.passwordField.getPassword());
 
-                AuthDialog.this.socialAuthenticator.authorize(username, password)
-                        .thenAcceptAsync(aBoolean -> {
-                            System.out.println("Logged in");
-                        });
+                AuthDialog.this.socialAuthenticator
+                        .authorize(username, password)
+                        .whenCompleteAsync((aBoolean, throwable) -> onLoggedIn(aBoolean, throwable));
             }
         };
+    }
+
+    private void onLoggedIn(boolean status, Throwable error) {
+
     }
 
     private void initializeLayout(JPanel dialog) {

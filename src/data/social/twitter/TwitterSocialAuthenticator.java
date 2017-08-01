@@ -6,13 +6,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class TwitterSocialAuthenticator implements SocialAuthenticator {
 
+    private final TwitterApiService service = TwitterApiService.getInstance();
+
     @Override
     public CompletableFuture<Boolean> authorize(String username, String password) {
-
-    }
-
-    @Override
-    public void onSuccess(String token) {
-
+        return service.authorize(username, password);
     }
 }

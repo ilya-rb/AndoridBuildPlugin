@@ -8,8 +8,6 @@ public interface SocialAuthenticator {
 
     CompletableFuture<Boolean> authorize(String username, String password);
 
-    void onSuccess(String token);
-
     class Factory {
 
         public static SocialAuthenticator create(SocialType type) {
