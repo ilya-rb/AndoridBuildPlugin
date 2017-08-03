@@ -3,6 +3,7 @@ package ui;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBCardLayout;
+import com.sun.javafx.scene.SceneHelper;
 import common.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +54,7 @@ public class SocialProviderSelectDialog extends DialogWrapper implements ActionL
             @Override
             protected void doAction(ActionEvent actionEvent) {
                 dispose();
-                AuthDialog.createInstance(selectedType).show();
+                AuthDialog.createInstance(selectedType);
             }
         };
     }

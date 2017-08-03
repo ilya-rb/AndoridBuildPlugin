@@ -1,22 +1,19 @@
 package ui;
 
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBPasswordField;
-import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.JBInsets;
-import com.intellij.util.ui.JBUI;
+import com.intellij.ui.JBColor;
 import common.Constants;
 import data.social.SocialAuthenticator;
 import data.social.SocialType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import data.social.twitter.TwitterSocialAuthenticator;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.web.WebView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
-public class AuthDialog extends DialogWrapper {
+public class AuthDialog {
 
     /**
      * Default symbols count in input field
@@ -28,99 +25,44 @@ public class AuthDialog extends DialogWrapper {
      */
     private final SocialAuthenticator socialAuthenticator;
 
-    @Nullable
-    private JTextField usernameField;
-
-    @Nullable
-    private JBPasswordField passwordField;
-
     static AuthDialog createInstance(SocialType type) {
-        AuthDialog dialog = new AuthDialog(type);
-        dialog.setTitle(Constants.AUTH_DIALOG_CREDENTIALS_TITLE);
-        return dialog;
+        return new AuthDialog(type);
     }
 
     private AuthDialog(SocialType type) {
-        super(false);
+        initializeLayout();
         this.socialAuthenticator = SocialAuthenticator.Factory.create(type);
-        init();
     }
 
-    @Nullable
-    @Override
-    protected JComponent createCenterPanel() {
-        JPanel dialog = new JPanel(new GridBagLayout());
-        initializeLayout(dialog);
-        return dialog;
-    }
+    private void initializeLayout() {
+        JFrame jFrame = new JFrame(Constants.AUTH_DIALOG_CREDENTIALS_TITLE);
+        JFXPanel panel = new JFXPanel();
 
-    @NotNull
-    @Override
-    protected Action getOKAction() {
-        return new DialogWrapperAction(Constants.AUTH_BTN_AUTHORIZE) {
-            @Override
-            protected void doAction(ActionEvent actionEvent) {
-                if (AuthDialog.this.usernameField == null || AuthDialog.this.passwordField == null) {
-                    return;
-                }
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
-                String username = AuthDialog.this.usernameField.getText();
-                String password = String.valueOf(AuthDialog.this.passwordField.getPassword());
+        jFrame.add(panel);
+        jFrame.setBackground(JBColor.DARK_GRAY);
+        jFrame.setMinimumSize(new Dimension(dim.width / 2, dim.height / 2));
+        jFrame.setLocation(dim.width / 2 - jFrame.getMinimumSize().width / 2, dim.height / 2 - jFrame.getMinimumSize().height / 2);
 
-                AuthDialog.this.socialAuthenticator
-                        .authorize(username, password)
-                        .whenCompleteAsync((aBoolean, throwable) -> onLoggedIn(aBoolean, throwable));
-            }
-        };
+        Platform.runLater(() -> {
+            WebView webView = new WebView();
+
+            webView.setMinWidth(jFrame.getMinimumSize().width);
+            webView.setMinHeight(jFrame.getMinimumSize().height);
+
+            panel.setScene(new Scene(webView));
+
+            jFrame.setVisible(true);
+            jFrame.toFront();
+
+            ((TwitterSocialAuthenticator) socialAuthenticator)
+                    .requestOauthToken()
+                    .thenAcceptAsync(s -> webView.getEngine().load(s));
+        });
     }
 
     private void onLoggedIn(boolean status, Throwable error) {
 
-    }
-
-    private void initializeLayout(JPanel dialog) {
-        dialog.setLayout(new GridBagLayout());
-
-        this.usernameField = new JBTextField(DEFAULT_COLUMNS_COUNT);
-        this.passwordField = new JBPasswordField();
-        this.passwordField.setColumns(DEFAULT_COLUMNS_COUNT);
-
-        JBInsets fieldInsets = JBUI.insets(0, 0, 5, 5);
-        JBInsets labelInsets = JBUI.insets(0, 0, 5, 0);
-
-        GridBagConstraints constraints = new GridBagConstraints();
-
-        // Username hint label
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.insets = fieldInsets;
-
-        dialog.add(new JBLabel(Constants.AUTH_HINT_USERNAME), constraints);
-
-        // Username input field
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.insets = labelInsets;
-
-        dialog.add(this.usernameField, constraints);
-
-        // Password hint label
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 1;
-        constraints.insets = fieldInsets;
-
-        dialog.add(new JBLabel(Constants.AUTH_HINT_PASSWORD), constraints);
-
-        // Password input field
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        constraints.gridwidth = 2;
-        constraints.insets = labelInsets;
-
-        dialog.add(this.passwordField, constraints);
     }
 }

@@ -14,6 +14,14 @@ public final class NetworkScheduler {
     public NetworkScheduler() {
     }
 
+    public <T> Future<T> submit(Callable<T> task) {
+        return executor.submit(task);
+    }
+
+    public void run(Runnable runnable) {
+        executor.execute(runnable);
+    }
+
     public Executor getExecutor() {
         return executor;
     }

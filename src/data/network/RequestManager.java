@@ -1,22 +1,19 @@
 package data.network;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class RequestManager {
 
-    private static final String REQUEST_GET = "GET";
-    private static final String REQUEST_POST = "POST";
+    public static final String REQUEST_ERROR = "";
 
     /**
      * 10 Seconds
@@ -32,50 +29,55 @@ public final class RequestManager {
         this.baseEndpoint = endpoint;
     }
 
-    public String get(String path, @Nullable RequestParam ...params) {
+    public String performRequest(@NotNull String path,
+                                 @NotNull RequestType type,
+                                 @Nullable List<Pair> params,
+                                 @Nullable List<Pair> headers) {
+
+        HttpsURLConnection connection = null;
+        BufferedReader input = null;
+
         try {
             URL url = new URL(baseEndpoint + path);
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection = (HttpsURLConnection) url.openConnection();
 
-            connection.setRequestMethod(REQUEST_POST);
+            connection.setRequestMethod(type.name());
             connection.setConnectTimeout(CONNECTION_TIMEOUT);
             connection.setReadTimeout(CONNECTION_TIMEOUT);
 
             if (params != null) {
-                for (RequestParam param : params) {
-                    connection.addRequestProperty(param.getName(), param.getValue());
+                for (Pair param : params) {
+                    connection.addRequestProperty(param.getFirst(), param.getSecond());
                 }
             }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            if (headers != null) {
+                for (Pair param : headers) {
+                    connection.setRequestProperty(param.getFirst(), param.getSecond());
+                }
+            }
 
-            return in.lines().collect(Collectors.joining("\n"));
+            input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            return input.lines().collect(Collectors.joining("\n"));
 
         } catch (IOException e) {
             e.printStackTrace();
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        return "";
+        return REQUEST_ERROR;
     }
-
-    public static class RequestParam {
-
-        private final String name;
-
-        private final String value;
-
-        public RequestParam(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        String getName() {
-            return name;
-        }
-
-        String getValue() {
-            return value;
-        }
-    }
-
 }

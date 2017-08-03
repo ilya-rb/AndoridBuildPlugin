@@ -12,4 +12,8 @@ public class TwitterSocialAuthenticator implements SocialAuthenticator {
     public CompletableFuture<Boolean> authorize(String username, String password) {
         return service.authorize(username, password);
     }
+
+    public CompletableFuture<String> requestOauthToken() {
+        return service.requestOauthToken();
+    }
 }
